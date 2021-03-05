@@ -1,23 +1,4 @@
 
-
-const players = [
-    {
-        name: "Alex",
-        score: 0,
-        id: 1
-    },
-    {
-        name: "Abby",
-        score: 0,
-        id: 2
-    },    
-    {
-        name: "Billy",
-        score: 0,
-        id: 3
-    }
-];
-
 const Header = (props) => {
     return (
         <header>
@@ -31,46 +12,103 @@ const Player = (props) => {
     return (
         <div className="player">
             <span className="player-name">
+                <button className="remove-player" onClick={() => props.removePlayer(props.id)}>✖</button>
                 {props.name}
             </span>
-            <Counter 
-                score={props.score}
-            />
+            <Counter />
         </div>
     );
 }
 
-const Counter = (props) => {
-    return (
-        <div className="counter">
-            <button className="counter-action decrement"> - </button>
-            <span className="counter-score">{props.score}</span>
-            <button className="counter-action increment"> + </button>
-        </div>
-    );
+class Counter extends React.Component {
+    /* Constructor version for adding state
+    constructor() {
+        super()
+        this.state = {
+            score: 0
+        }
+    }
+    */
+
+    // Direct version (not supported by all browsers but that's okay because babel is transpiling)
+    state = {
+        score: 0
+    }
+
+    // Writing as arrow function means it's automatically bound to the instance rather than having to bind through a different way
+    incrementScore = () => {
+        this.setState( prevState => ({
+            score: this.state.score + 1 
+        }))
+    }
+
+    decrementScore = () => {
+        this.setState( prevState => ({
+            score: prevState.score - 1
+        }))
+    }
+
+    render() {  
+        return (
+            <div className="counter">
+                <button className="counter-action decrement" onClick={this.decrementScore}> - </button>
+                <span className="counter-score">{ this.state.score }</span>
+                <button className="counter-action increment" onClick={this.incrementScore}> + </button>
+            </div>
+        );
+    }
 }
 
-const App = (props) => {
-    return (
-        <div className="scoreboard">
-            <Header 
-                title="Scoreboard" 
-                totalPlayers={props.initialPlayers.length}
-            />
-            {/* Players list */}
-            {props.initialPlayers.map( player =>
-                <Player 
-                    name={player.name} 
-                    score={player.score}
-                    key={player.id.toString()} 
+class App extends React.Component {
+    state = {
+        players: [
+            {
+                name: "Alex",
+                id: 1
+            },
+            {
+                name: "Abby",
+                id: 2
+            },    
+            {
+                name: "Billy",
+                id: 3
+            }
+        ]
+    }
+
+    handleRemovePlayer = (id) => {
+        this.setState( prevState => {
+            return {
+                players: prevState.players.filter( player => player.id !== id )
+            }
+        })
+    }
+
+    render() {
+        return (
+            <div className="scoreboard">
+                <Header 
+                    title="Scoreboard" 
+                    totalPlayers={this.state.players.length}
                 />
-            )}
-        </div>
-    )
+            
+                {/* Players list */}
+                {this.state.players.map( player =>
+                    <Player 
+                        name={player.name}
+                        id={player.id}
+                        key={player.id.toString()} 
+                        removePlayer={this.handleRemovePlayer}
+                    />
+                )}
+            </div>
+        );
+    }
 }
 
 ReactDOM.render(
-    <App initialPlayers={players}/>,
+    <App />,
     document.getElementById('root')
 );
 
