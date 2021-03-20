@@ -42,7 +42,7 @@ class App extends Component {
     this.setState( prevState => {
         return {
           players: [
-            ...prevState.state.players,
+            ...prevState.players,
             {
               name,
               score: 0,
